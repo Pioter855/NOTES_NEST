@@ -1,11 +1,12 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Notes } from '../database/database.entity';
 
 @Injectable()
 export class NotesService {
   constructor(
-    @Inject('NOTES_REPOSITORY') private notesRepository: Repository<Notes>,
+    @InjectRepository(Notes) private readonly notesRepository: Repository<Notes>,
   ) {}
 
   async findAll(): Promise<Notes[]> {
@@ -21,7 +22,7 @@ export class NotesService {
     if (!note) {
       throw new BadRequestException('something went wrong');
     }
-    return this.notesRepository.findOne({ where: { id: id } });
+    return this.notesRepository.findOne({ where: { id } });
   }
 
   async add(title: string, content: string): Promise<Notes> {
@@ -42,13 +43,12 @@ export class NotesService {
     this.notesRepository.softRemove(note);
   }
 
-  async edit(id: number, title: string, content: string) {
-    const note = await this.notesRepository.findOne({ where: { id: id } });
+  async edit(id: number, updateDto) {
+    const note = await this.notesRepository.preload({id, ...updateDto});
     if (!note) {
       throw new BadRequestException('note does not exist');
     }
-    note.title = title;
-    note.content = content;
+   
     return await this.notesRepository.save(note);
   }
 }

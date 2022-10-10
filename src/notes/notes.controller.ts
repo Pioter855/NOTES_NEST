@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { UpdateDto } from './dtos/update.dto';
 import { NoteDto } from './dtos/note.dto';
 import { NotesService } from './notes.service';
 
@@ -22,8 +23,8 @@ export class NotesController {
   }
 
   @Get('/:id')
-  getNote(@Param('id') id: string) {
-    return this.notesService.getById(parseInt(id));
+  getNote(@Param('id') id: number) {
+    return this.notesService.getById(id);
   }
 
   @Post()
@@ -34,12 +35,12 @@ export class NotesController {
 
   @Delete('/:id')
   @HttpCode(204)
-  removeNote(@Param('id') id: string) {
-    return this.notesService.remove(parseInt(id));
+  removeNote(@Param('id') id: number) {
+    return this.notesService.remove(id);
   }
 
   @Patch('/:id')
-  editNote(@Body() body: NoteDto, @Param('id') id: string) {
-    return this.notesService.edit(+id, body.content, body.title);
+  editNote(@Body() updateDto: UpdateDto, @Param('id') id: number) {
+    return this.notesService.edit(id, updateDto);
   }
 }
