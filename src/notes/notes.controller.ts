@@ -11,6 +11,7 @@ import {
 import { UpdateDto } from './dtos/update.dto';
 import { NoteDto } from './dtos/note.dto';
 import { NotesService } from './notes.service';
+import { Notes } from '../entities/notes.entity';
 
 
 @Controller('notes')
@@ -18,29 +19,29 @@ export class NotesController {
   constructor(private notesService: NotesService) {}
 
   @Get()
-  getNotes() {
+  getNotes() : Promise<Notes[]>{
     return this.notesService.getAll();
   }
 
   @Get('/:id')
-  getNote(@Param('id') id: number) {
+  getNote(@Param('id') id: number) : Promise<Notes> {
     return this.notesService.getById(id);
   }
 
   @Post()
-  addNote(@Body() body: NoteDto) {
+  addNote(@Body() body: NoteDto) : Promise<Notes> {
     return this.notesService.add(body.title, body.content);
     
   }
 
   @Delete('/:id')
   @HttpCode(204)
-  removeNote(@Param('id') id: number) {
+  removeNote(@Param('id') id: number): Promise<Notes> {
     return this.notesService.remove(id);
   }
 
   @Patch('/:id')
-  editNote(@Body() updateDto: UpdateDto, @Param('id') id: number) {
+  editNote(@Body() updateDto: UpdateDto, @Param('id') id: number): Promise<Notes> {
     return this.notesService.edit(id, updateDto);
   }
 }

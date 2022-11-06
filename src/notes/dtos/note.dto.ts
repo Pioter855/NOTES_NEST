@@ -1,11 +1,7 @@
-import { IsString } from "class-validator";
-
-
+import { IsString } from 'class-validator';
 export class NoteDto {
-    @IsString()
-    title: string
-    @IsString()
-    content: string
-    
-    
+  @IsString()
+  title: string;
+  @IsString()
+  content: string;
 }

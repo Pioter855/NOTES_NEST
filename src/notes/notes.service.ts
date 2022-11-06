@@ -1,28 +1,25 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Notes } from '../database/database.entity';
+import { Notes } from '../entities/notes.entity';
 
 @Injectable()
 export class NotesService {
   constructor(
-    @InjectRepository(Notes) private readonly notesRepository: Repository<Notes>,
+    @InjectRepository(Notes)
+    private readonly notesRepository: Repository<Notes>,
   ) {}
 
-  async findAll(): Promise<Notes[]> {
+  getAll(): Promise<Notes[]> {
     return this.notesRepository.find();
   }
 
-  getAll() {
-    return this.notesRepository.find();
-  }
-
-  async getById(id: number) {
+  async getById(id: number) : Promise<Notes> {
     const note = await this.notesRepository.findOne({ where: { id } });
     if (!note) {
       throw new BadRequestException('something went wrong');
     }
-    return this.notesRepository.findOne({ where: { id } });
+    return note
   }
 
   async add(title: string, content: string): Promise<Notes> {
@@ -35,20 +32,20 @@ export class NotesService {
     );
   }
 
-  async remove(id: number) {
+  async remove(id: number): Promise<Notes> {
     const note = await this.notesRepository.findOne({ where: { id } });
     if (!note) {
       throw new BadRequestException('note does not exist');
     }
-    this.notesRepository.softRemove(note);
+   return this.notesRepository.softRemove(note);
   }
 
-  async edit(id: number, updateDto) {
-    const note = await this.notesRepository.preload({id, ...updateDto});
+  async edit(id: number, updateDto): Promise<Notes> {
+    const note = await this.notesRepository.preload({ id, ...updateDto });
     if (!note) {
       throw new BadRequestException('note does not exist');
     }
-   
-    return await this.notesRepository.save(note);
+
+    return this.notesRepository.save(note);
   }
 }
